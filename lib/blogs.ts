@@ -154,10 +154,19 @@ export const fallbackBlogs: Blog[] = [
   }
 ];
 
-const API_BASE = "https://api.upliftai.co/api/public/v1/blogs";
+const DEFAULT_UPLIFT_BLOGS_URL = "https://api.upliftai.co/api/public/v1/blogs";
 
 function token() {
   return process.env.UPLIFT_TOKEN?.trim();
+}
+
+function listUrl() {
+  return process.env.UPLIFT_API_URL?.trim() || DEFAULT_UPLIFT_BLOGS_URL;
+}
+
+function detailUrl(slug: string) {
+  const baseUrl = listUrl().replace(/\/blogs\/?$/, "/blog");
+  return `${baseUrl}/${encodeURIComponent(slug)}`;
 }
 
 function sortBlogs(blogs: Blog[]) {
@@ -176,13 +185,13 @@ export async function getBlogs(): Promise<BlogListResult> {
   }
 
   try {
-    const response = await fetch(
-      `${API_BASE}/${encodeURIComponent(upliftToken)}?status=PUBLISH&limit=100`,
-      {
-        headers: { Accept: "application/json" },
-        next: { revalidate: 300 }
-      }
-    );
+    const response = await fetch(`${listUrl()}?status=PUBLISH&limit=100`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${upliftToken}`
+      },
+      next: { revalidate: 300 }
+    });
 
     if (!response.ok) {
       throw new Error(`Uplift returned ${response.status}`);
@@ -206,8 +215,11 @@ export async function getBlog(slug: string): Promise<Blog | null> {
 
   if (upliftToken) {
     try {
-      const response = await fetch(`${API_BASE}/${encodeURIComponent(upliftToken)}/${encodeURIComponent(slug)}`, {
-        headers: { Accept: "application/json" },
+      const response = await fetch(detailUrl(slug), {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${upliftToken}`
+        },
         next: { revalidate: 300 }
       });
 

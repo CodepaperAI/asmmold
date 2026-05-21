@@ -48,10 +48,11 @@ Create the deployment environment variables from `.env.example`:
 
 ```bash
 UPLIFT_TOKEN=your_uplift_token_here
+UPLIFT_API_URL=https://api.upliftai.co/api/public/v1/blogs
 NEXT_PUBLIC_SITE_URL=https://blog.asmmoldremoval.ca
 ```
 
-`UPLIFT_TOKEN` is used only on the server. The browser calls the Next app, not Uplift directly.
+`UPLIFT_TOKEN` and `UPLIFT_API_URL` are used only on the server. The browser calls the Next app, not Uplift directly.
 
 ## Verification
 
